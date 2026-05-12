@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - ElectroShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { corePlugins: { preflight: false } }
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">Nuestros Productos</h2>
+        <div id="products-container" class="products-grid">
+            <p>Cargando productos...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch(API_URL + '/products');
+                const products = await response.json();
+                const container = document.getElementById('products-container');
+                container.innerHTML = products.map(p => {
+                    const image = p.imagenUrl
+                        ? p.imagenUrl
+                        : 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=300&fit=crop';
+                    return `
+                    <div class="product-card !rounded-xl !shadow-lg hover:!shadow-2xl !transition-all !duration-300 hover:-translate-y-1">
+                        <img src="${image}" alt="${p.nombre}" loading="lazy" class="!w-full !h-40 !object-cover !rounded-lg !mb-3">
+                        <h3 class="!text-base !font-semibold !mb-1 !text-[var(--text)]">${p.nombre}</h3>
+                        <p class="!text-sm !opacity-65 !mb-1 !text-[var(--text)]">${p.descripcion || ''}</p>
+                        <p class="price !text-lg !font-bold !text-[var(--success)] !my-1.5">${formatCOP(p.precio)}</p>
+                        <p class="stock !text-xs !opacity-55 !mb-2.5 !text-[var(--text)]">Stock: ${p.stock}</p>
+                        <button onclick="addToCart(${p.id})" class="btn btn-primary !w-full !mt-auto !py-2 !px-4 !rounded-lg !font-semibold !text-white !bg-[var(--primary)] hover:!bg-[var(--primary-hover)] !border-none !cursor-pointer !transition-all !duration-200 !shadow-sm hover:!shadow-md">Agregar al Carrito</button>
+                    </div>
+                `}).join('');
+            } catch (error) {
+                document.getElementById('products-container').innerHTML =
+                    '<p class="error">Error al cargar productos. Asegurate de que el servidor este corriendo.</p>';
+            }
+        }
+
+        async function addToCart(productId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Debes iniciar sesion primero');
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const response = await fetch(API_URL + '/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ productoId: productId, cantidad: 1 })
+                });
+                if (response.ok) {
+                    alert('Producto agregado al carrito');
+                    updateCartCount();
+                }
+            } catch (error) {
+                alert('Error al agregar al carrito');
+            }
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>

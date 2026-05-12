@@ -1,0 +1,72 @@
+@startuml
+skinparam backgroundColor #F8FAFC
+skinparam actorBackgroundColor #2563EB
+skinparam actorBorderColor #1D4ED8
+skinparam actorFontColor #FFFFFF
+skinparam useCaseBackgroundColor #FFFFFF
+skinparam useCaseBorderColor #2563EB
+skinparam useCaseFontColor #0F172A
+skinparam arrowColor #2563EB
+skinparam shadowing false
+
+left to right direction
+
+title "Diagrama de Casos de Uso - ElectroShop"
+
+actor "Cliente" as cliente
+actor "Administrador" as admin
+
+rectangle "Sistema Ecommerce" {
+  ' Casos de uso del Cliente
+  usecase "Registrarse" as UC01
+  usecase "Iniciar Sesion" as UC02
+  usecase "Ver Productos" as UC03
+  usecase "Buscar Productos" as UC04
+  usecase "Agregar al Carrito" as UC05
+  usecase "Ver Carrito" as UC06
+  usecase "Eliminar del Carrito" as UC07
+  usecase "Realizar Pedido" as UC08
+  usecase "Ver Historial de Pedidos" as UC09
+  usecase "Pagar con Tarjeta" as UC10
+  usecase "Pagar Contra Entrega" as UC11
+
+  ' Casos de uso del Administrador
+  usecase "Gestionar Productos" as UC12
+  usecase "Agregar Producto" as UC13
+  usecase "Editar Producto" as UC14
+  usecase "Eliminar Producto" as UC15
+  usecase "Ver Dashboard" as UC16
+  usecase "Gestionar Pedidos" as UC17
+  usecase "Actualizar Estado Pedido" as UC18
+}
+
+' Relaciones actor - caso de uso
+cliente --> UC01
+cliente --> UC02
+cliente --> UC03
+cliente --> UC04
+cliente --> UC05
+cliente --> UC06
+cliente --> UC07
+cliente --> UC08
+cliente --> UC09
+
+admin --> UC02
+admin --> UC12
+admin --> UC16
+admin --> UC17
+
+' Include / Extend
+UC08 --> UC10 : <<include>>
+UC08 --> UC11 : <<include>>
+
+UC12 --> UC13 : <<include>>
+UC12 --> UC14 : <<include>>
+UC12 --> UC15 : <<include>>
+
+UC17 --> UC18 : <<include>>
+
+UC05 ..> UC02 : <<extends>>
+UC08 ..> UC06 : <<extends>>
+
+@enduml

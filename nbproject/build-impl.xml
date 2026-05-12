@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ecommerce-poo" default="jar" basedir=".">
+    <description>Builds, tests, and runs the project ecommerce-poo.</description>
+    <import file="nbproject/build-impl.xml"/>
+    
+    <target name="jar" depends="compile">
+        <copy todir="dist">
+            <fileset dir="${build.classes.dir}"/>
+        </copy>
+        <jar jarfile="dist/ecommerce-poo.jar" basedir="dist"/>
+    </target>
+</project>

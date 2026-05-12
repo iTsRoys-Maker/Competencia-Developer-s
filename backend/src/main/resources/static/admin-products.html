@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Productos - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Panel de Administracion</h1>
+        <nav>
+            <a href="admin.html">Pedidos</a>
+            <a href="admin-products.html">Productos</a>
+            <a href="#" onclick="logout()">Cerrar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Gestion de Productos</h2>
+        
+        <div style="background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+            <h3>Agregar Nuevo Producto</h3>
+            <form id="product-form">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div class="form-group">
+                        <label>Nombre:</label>
+                        <input type="text" id="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Descripcion:</label>
+                        <input type="text" id="descripcion">
+                    </div>
+                    <div class="form-group">
+                        <label>Precio:</label>
+                        <input type="number" id="precio" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock:</label>
+                        <input type="number" id="stock" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria:</label>
+                        <input type="text" id="categoria">
+                    </div>
+                    <div class="form-group">
+                        <label>URL Imagen:</label>
+                        <input type="text" id="imagenUrl">
+                    </div>
+                </div>
+                <button type="submit" class="btn" style="margin-top: 1rem;">Agregar Producto</button>
+            </form>
+        </div>
+        
+        <div id="products-container">
+            <p>Cargando productos...</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        async function loadProducts() {
+            const token = getToken();
+            const user = getUser();
+            
+            if (!token || user?.rol !== 'ADMIN') {
+                alert('Acceso denegado');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL + '/products');
+                const products = await response.json();
+                
+                const container = document.getElementById('products-container');
+                container.innerHTML = products.map(p => `
+                    <div class="product-card">
+                        <h3>${p.nombre}</h3>
+                        <p>${p.descripcion || ''}</p>
+                        <p class="price">$${parseFloat(p.precio).toFixed(2)}</p>
+                        <p class="stock">Stock: ${p.stock}</p>
+                        <p>Categoria: ${p.categoria || 'N/A'}</p>
+                        <button onclick="deleteProduct(${p.id})" class="btn" style="background: #e74c3c; padding: 0.5rem;">Eliminar</button>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('products-container').innerHTML = '<p class="error">Error al cargar productos.</p>';
+            }
+        }
+        
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getToken();
+            
+            const producto = {
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value),
+                categoria: document.getElementById('categoria').value,
+                imagenUrl: document.getElementById('imagenUrl').value
+            };
+            
+            try {
+                const response = await fetch(API_URL + '/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(producto)
+                });
+                
+                if (response.ok) {
+                    alert('Producto agregado!');
+                    document.getElementById('product-form').reset();
+                    loadProducts();
+                }
+            } catch (error) {
+                alert('Error al agregar producto');
+            }
+        });
+        
+        async function deleteProduct(id) {
+            if (!confirm('Estas seguro de eliminar este producto?')) return;
+            
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/products/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                loadProducts();
+            } catch (error) {
+                alert('Error al eliminar');
+            }
+        }
+        
+        loadProducts();
+    </script>
+</body>
+</html>

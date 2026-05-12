@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Pedidos - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ecommerce POO</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="products.html">Productos</a>
+            <a href="cart.html">Carrito</a>
+            <a href="#" onclick="logout()">Cerrar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Mis Pedidos</h2>
+        <div id="orders-container">
+            <p>Cargando pedidos...</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        async function loadOrders() {
+            const token = getToken();
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL + '/orders/my-orders', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!response.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const orders = await response.json();
+                const container = document.getElementById('orders-container');
+                
+                if (!orders || orders.length === 0) {
+                    container.innerHTML = '<p>No tienes pedidos ancora.</p><a href="products.html" class="btn">Ir a la tienda</a>';
+                    return;
+                }
+                
+                container.innerHTML = orders.map(order => `
+                    <div style="background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <div>
+                                <strong>Pedido #${order.id}</strong>
+                                <p>Fecha: ${new Date(order.fechaPedido).toLocaleString()}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status status-${order.estado.toLowerCase()}">${order.estado}</span>
+                                <p><strong>Total: $${parseFloat(order.total).toFixed(2)}</strong></p>
+                            </div>
+                        </div>
+                        <p><strong>Metodo de Pago:</strong> ${order.metodoPago}</p>
+                        <p><strong>Direccion:</strong> ${order.direccionEnvio}</p>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('orders-container').innerHTML = '<p class="error">Error al cargar pedidos.</p>';
+            }
+        }
+        
+        loadOrders();
+    </script>
+    
+    <style>
+        .status { padding: 0.25rem 0.75rem; border-radius: 4px; color: white; }
+        .status-pendiente { background: #f39c12; }
+        .status-completado { background: #27ae60; }
+        .status-cancelado { background: #e74c3c; }
+    </style>
+</body>
+</html>

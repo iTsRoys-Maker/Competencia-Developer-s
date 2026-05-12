@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Productos - ElectroShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { corePlugins: { preflight: false } }
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar !w-60 !bg-[var(--card)] !border-r !border-[var(--border)] !p-6">
+            <h3 class="!text-xs !uppercase !tracking-wider !opacity-50 !mb-4 !pl-3">Navegacion</h3>
+            <a href="admin.html" class="!block !px-3 !py-2.5 !rounded-lg !font-semibold !mb-1 hover:!bg-[var(--primary)] hover:!text-white !text-[var(--text)] !no-underline transition-all duration-200">Dashboard</a>
+            <a href="admin-products.html" class="!block !px-3 !py-2.5 !rounded-lg !font-semibold !mb-1 !bg-[var(--primary)] !text-white !no-underline transition-all duration-200">Productos</a>
+            <a href="admin.html" class="!block !px-3 !py-2.5 !rounded-lg !font-semibold !mb-1 hover:!bg-[var(--primary)] hover:!text-white !text-[var(--text)] !no-underline transition-all duration-200">Pedidos</a>
+            <hr class="!border-none !border-t !border-[var(--border)] !my-4">
+            <a href="index.html" class="!block !px-3 !py-2.5 !rounded-lg !font-semibold !mb-1 hover:!bg-[var(--primary)] hover:!text-white !text-[var(--text)] !no-underline transition-all duration-200">← Volver a la Tienda</a>
+        </aside>
+
+        <main class="admin-content !p-8">
+            <h2 class="!text-2xl !font-bold !mb-6 !text-[var(--text)]">Gestion de Productos</h2>
+
+            <!-- Card del formulario con Tailwind -->
+            <div class="!bg-[var(--card)] !rounded-xl !shadow-lg !p-8 !mb-8 transition-all duration-300">
+                <h3 class="!text-lg !font-semibold !mb-6 !text-[var(--text)]">Agregar Nuevo Producto</h3>
+                <form id="product-form">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">Nombre:</label>
+                            <input type="text" id="nombre" required class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">Descripcion:</label>
+                            <input type="text" id="descripcion" class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">Precio:</label>
+                            <input type="number" id="precio" step="0.01" required class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">Stock:</label>
+                            <input type="number" id="stock" required class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">Categoria:</label>
+                            <input type="text" id="categoria" class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                        <div class="form-group">
+                            <label class="!text-sm !font-semibold !mb-1.5 !block !text-[var(--text)]">URL Imagen:</label>
+                            <input type="text" id="imagenUrl" class="!w-full !h-10 !rounded-lg !border !border-[var(--border)] !px-3 !bg-[var(--card)] !text-[var(--text)] !text-sm focus:!border-[var(--primary)] focus:!ring-2 focus:!ring-blue-500/20 !outline-none transition-all">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary !mt-6 !px-8 !py-2.5 !rounded-lg !font-semibold !text-white !bg-[var(--primary)] hover:!bg-[var(--primary-hover)] transition-all duration-200 !shadow-md hover:!shadow-lg !border-none !cursor-pointer">Agregar Producto</button>
+                </form>
+            </div>
+
+            <!-- Tabla de productos con Tailwind -->
+            <div id="products-container">
+                <p class="!text-[var(--text)] !opacity-70">Cargando productos...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        async function loadProducts() {
+            const token = getToken();
+            const user = getUser();
+            if (!token || user?.rol !== 'ADMIN') {
+                alert('Acceso denegado');
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const response = await fetch(API_URL + '/products');
+                const products = await response.json();
+                const container = document.getElementById('products-container');
+                if (!products || products.length === 0) {
+                    container.innerHTML = '<p class="!text-[var(--text)] !opacity-70">No hay productos registrados.</p>';
+                    return;
+                }
+                container.innerHTML = `
+                    <div class="!bg-[var(--card)] !rounded-xl !shadow-lg !overflow-hidden transition-all duration-300">
+                        <table class="!w-full !border-collapse">
+                            <thead>
+                                <tr class="!bg-[var(--border)]">
+                                    <th class="!px-4 !py-3 !text-left !text-xs !font-bold !uppercase !tracking-wider !text-[var(--text)]">Imagen</th>
+                                    <th class="!px-4 !py-3 !text-left !text-xs !font-bold !uppercase !tracking-wider !text-[var(--text)]">Nombre</th>
+                                    <th class="!px-4 !py-3 !text-left !text-xs !font-bold !uppercase !tracking-wider !text-[var(--text)]">Precio</th>
+                                    <th class="!px-4 !py-3 !text-left !text-xs !font-bold !uppercase !tracking-wider !text-[var(--text)]">Stock</th>
+                                    <th class="!px-4 !py-3 !text-left !text-xs !font-bold !uppercase !tracking-wider !text-[var(--text)]">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${products.map((p, i) => `
+                                    <tr class="hover:!bg-[var(--border)]/30 transition-colors duration-150 ${i < products.length - 1 ? '!border-b !border-[var(--border)]' : ''}">
+                                        <td class="!px-4 !py-3">
+                                            <img src="${p.imagenUrl || 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=100&h=100&fit=crop'}" alt="${p.nombre}" loading="lazy" class="!w-12 !h-12 !object-cover !rounded-lg !shadow-sm">
+                                        </td>
+                                        <td class="!px-4 !py-3 !font-medium !text-[var(--text)]">${p.nombre}</td>
+                                        <td class="!px-4 !py-3 price !text-base !text-[var(--success)] !font-bold">${formatCOP(p.precio)}</td>
+                                        <td class="!px-4 !py-3">
+                                            <span class="!inline-flex !items-center !px-2.5 !py-1 !rounded-full !text-xs !font-semibold ${p.stock > 10 ? '!bg-green-100 !text-green-800 dark:!bg-green-900 dark:!text-green-200' : p.stock > 0 ? '!bg-yellow-100 !text-yellow-800 dark:!bg-yellow-900 dark:!text-yellow-200' : '!bg-red-100 !text-red-800 dark:!bg-red-900 dark:!text-red-200'}">${p.stock}</span>
+                                        </td>
+                                        <td class="!px-4 !py-3">
+                                            <div class="flex gap-2">
+                                                <button onclick="editProduct(${p.id})" class="!px-3 !py-1.5 !rounded-lg !text-xs !font-semibold !text-white !bg-[var(--primary)] hover:!bg-[var(--primary-hover)] !border-none !cursor-pointer transition-all duration-200 !shadow-sm hover:!shadow-md">Editar</button>
+                                                <button onclick="deleteProduct(${p.id})" class="!px-3 !py-1.5 !rounded-lg !text-xs !font-semibold !text-white !bg-[var(--danger)] hover:!bg-red-700 !border-none !cursor-pointer transition-all duration-200 !shadow-sm hover:!shadow-md">Eliminar</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('products-container').innerHTML = '<p class="error">Error al cargar productos.</p>';
+            }
+        }
+
+        async function editProduct(id) {
+            const nombre = prompt('Nuevo nombre:');
+            if (!nombre) return;
+            const precio = prompt('Nuevo precio:');
+            if (!precio) return;
+            const stock = prompt('Nuevo stock:');
+            if (!stock) return;
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/products/' + id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({
+                        nombre,
+                        precio: parseFloat(precio),
+                        stock: parseInt(stock)
+                    })
+                });
+                loadProducts();
+            } catch (error) {
+                alert('Error al editar producto');
+            }
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getToken();
+            const producto = {
+                nombre: document.getElementById('nombre').value,
+                descripcion: document.getElementById('descripcion').value,
+                precio: parseFloat(document.getElementById('precio').value),
+                stock: parseInt(document.getElementById('stock').value),
+                categoria: document.getElementById('categoria').value,
+                imagenUrl: document.getElementById('imagenUrl').value
+            };
+            try {
+                const response = await fetch(API_URL + '/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(producto)
+                });
+                if (response.ok) {
+                    alert('Producto agregado!');
+                    document.getElementById('product-form').reset();
+                    loadProducts();
+                }
+            } catch (error) {
+                alert('Error al agregar producto');
+            }
+        });
+
+        async function deleteProduct(id) {
+            if (!confirm('Estas seguro de eliminar este producto?')) return;
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/products/' + id, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                loadProducts();
+            } catch (error) {
+                alert('Error al eliminar');
+            }
+        }
+
+        loadProducts();
+    </script>
+</body>
+</html>

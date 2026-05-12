@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ecommerce POO</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="products.html">Productos</a>
+            <a href="cart.html">Carrito (<span id="cart-count">0</span>)</a>
+            <a href="#" onclick="logout()">Cerrar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Mi Carrito de Compras</h2>
+        <div id="cart-container">
+            <p>Cargando carrito...</p>
+        </div>
+        
+        <div id="checkout-section" style="display: none; margin-top: 2rem; padding: 1rem; background: white; border-radius: 8px;">
+            <h3>Confirmar Pedido</h3>
+            <form id="order-form">
+                <div class="form-group">
+                    <label>Direccion de Envio:</label>
+                    <input type="text" id="direccion" required>
+                </div>
+                <div class="form-group">
+                    <label>Metodo de Pago:</label>
+                    <select id="metodo-pago" required>
+                        <option value="TARJETA">Tarjeta de Credito/Debito</option>
+                        <option value="CONTRA_ENTREGA">Contra Entrega</option>
+                    </select>
+                </div>
+                <div id="pago-tarjeta" style="display: none;">
+                    <div class="form-group">
+                        <label>Numero de Tarjeta:</label>
+                        <input type="text" id="numero-tarjeta" placeholder="1234567890123456">
+                    </div>
+                    <div class="form-group">
+                        <label>Titular:</label>
+                        <input type="text" id="titular">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV:</label>
+                        <input type="text" id="cvv" placeholder="123">
+                    </div>
+                </div>
+                <div id="pago-contra-entrega" style="display: none;">
+                    <div class="form-group">
+                        <label>Nombre del Receptor:</label>
+                        <input type="text" id="nombre-receptor">
+                    </div>
+                    <div class="form-group">
+                        <label>Telefono:</label>
+                        <input type="text" id="telefono-contacto">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Confirmar Pedido</button>
+            </form>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        async function loadCart() {
+            const token = getToken();
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL + '/cart', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                
+                if (!response.ok) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const cart = await response.json();
+                const container = document.getElementById('cart-container');
+                
+                if (!cart.items || cart.items.length === 0) {
+                    container.innerHTML = '<p>Tu carrito esta vacio.</p><a href="products.html" class="btn">Ver Productos</a>';
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${cart.items.map(item => `
+                                <tr>
+                                    <td>${item.productoNombre}</td>
+                                    <td>$${parseFloat(item.precioUnitario).toFixed(2)}</td>
+                                    <td>${item.cantidad}</td>
+                                    <td>$${parseFloat(item.subtotal).toFixed(2)}</td>
+                                    <td>
+                                        <button onclick="removeFromCart(${item.productoId})" class="btn" style="padding: 0.5rem;">Eliminar</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3"><strong>Total:</strong></td>
+                                <td><strong>$${parseFloat(cart.total).toFixed(2)}</strong></td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                `;
+                
+                document.getElementById('cart-count').textContent = cart.cantidadTotal || 0;
+                document.getElementById('checkout-section').style.display = 'block';
+                
+            } catch (error) {
+                document.getElementById('cart-container').innerHTML = '<p class="error">Error al cargar el carrito.</p>';
+            }
+        }
+        
+        async function removeFromCart(productId) {
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/cart/remove/' + productId, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                loadCart();
+            } catch (error) {
+                alert('Error al eliminar producto');
+            }
+        }
+        
+        document.getElementById('metodo-pago').addEventListener('change', function() {
+            document.getElementById('pago-tarjeta').style.display = 
+                this.value === 'TARJETA' ? 'block' : 'none';
+            document.getElementById('pago-contra-entrega').style.display = 
+                this.value === 'CONTRA_ENTREGA' ? 'block' : 'none';
+        });
+        
+        document.getElementById('order-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getToken();
+            
+            const metodoPago = document.getElementById('metodo-pago').value;
+            const request = {
+                direccionEnvio: document.getElementById('direccion').value,
+                metodoPago: metodoPago
+            };
+            
+            if (metodoPago === 'TARJETA') {
+                request.numeroTarjeta = document.getElementById('numero-tarjeta').value;
+                request.titular = document.getElementById('titular').value;
+                request.cvv = document.getElementById('cvv').value;
+            } else {
+                request.nombreReceptor = document.getElementById('nombre-receptor').value;
+                request.telefonoContacto = document.getElementById('telefono-contacto').value;
+            }
+            
+            try {
+                const response = await fetch(API_URL + '/orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify(request)
+                });
+                
+                if (response.ok) {
+                    alert('Pedido realizado con exito!');
+                    window.location.href = 'orders.html';
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + (error.message || 'No se pudo procesar el pedido'));
+                }
+            } catch (error) {
+                alert('Error de conexion');
+            }
+        });
+        
+        loadCart();
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Panel de Administracion</h1>
+        <nav>
+            <a href="admin.html">Pedidos</a>
+            <a href="admin-products.html">Productos</a>
+            <a href="#" onclick="logout()">Cerrar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Gestion de Pedidos</h2>
+        
+        <div id="stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <div style="background: white; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 id="total-pedidos">0</h3>
+                <p>Total Pedidos</p>
+            </div>
+            <div style="background: #f39c12; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 id="pedidos-pendientes">0</h3>
+                <p>Pendientes</p>
+            </div>
+            <div style="background: #27ae60; color: white; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 id="pedidos-completados">0</h3>
+                <p>Completados</p>
+            </div>
+            <div style="background: white; padding: 1rem; border-radius: 8px; text-align: center;">
+                <h3 id="total-ventas">$0</h3>
+                <p>Total Ventas</p>
+            </div>
+        </div>
+        
+        <div id="orders-container">
+            <p>Cargando pedidos...</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        async function loadAdminOrders() {
+            const token = getToken();
+            const user = getUser();
+            
+            if (!token || user?.rol !== 'ADMIN') {
+                alert('Acceso denegado');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const [ordersRes, statsRes] = await Promise.all([
+                    fetch(API_URL + '/admin/orders', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    }),
+                    fetch(API_URL + '/admin/stats', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    })
+                ]);
+                
+                const orders = await ordersRes.json();
+                const stats = await statsRes.json();
+                
+                document.getElementById('total-pedidos').textContent = stats.totalPedidos || 0;
+                document.getElementById('pedidos-pendientes').textContent = stats.pedidosPendientes || 0;
+                document.getElementById('pedidos-completados').textContent = stats.pedidosCompletados || 0;
+                document.getElementById('total-ventas').textContent = '$' + parseFloat(stats.totalVentas || 0).toFixed(2);
+                
+                const container = document.getElementById('orders-container');
+                
+                if (!orders || orders.length === 0) {
+                    container.innerHTML = '<p>No hay pedidos ancora.</p>';
+                    return;
+                }
+                
+                container.innerHTML = orders.map(order => `
+                    <div style="background: white; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                            <div>
+                                <strong>Pedido #${order.id}</strong>
+                                <p>Cliente: ${order.cliente?.nombre || 'N/A'} (${order.cliente?.email || 'N/A'})</p>
+                                <p>Fecha: ${new Date(order.fechaPedido).toLocaleString()}</p>
+                            </div>
+                            <div style="text-align: right;">
+                                <span class="status status-${order.estado.toLowerCase()}">${order.estado}</span>
+                                <p><strong>Total: $${parseFloat(order.total).toFixed(2)}</strong></p>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Detalles:</strong>
+                            <ul>
+                                ${(order.detalles || []).map(d => `<li>${d.producto?.nombre || 'Producto'} x${d.cantidad} - $${parseFloat(d.precioUnitario).toFixed(2)}</li>`).join('')}
+                            </ul>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button onclick="updateStatus(${order.id}, 'PENDIENTE')" class="btn" style="padding: 0.5rem;">Pendiente</button>
+                            <button onclick="updateStatus(${order.id}, 'COMPLETADO')" class="btn" style="padding: 0.5rem; background: #27ae60;">Completar</button>
+                            <button onclick="updateStatus(${order.id}, 'CANCELADO')" class="btn" style="padding: 0.5rem; background: #e74c3c;">Cancelar</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                document.getElementById('orders-container').innerHTML = '<p class="error">Error al cargar datos.</p>';
+            }
+        }
+        
+        async function updateStatus(orderId, estado) {
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/admin/orders/' + orderId + '/status', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ estado })
+                });
+                loadAdminOrders();
+            } catch (error) {
+                alert('Error al actualizar estado');
+            }
+        }
+        
+        loadAdminOrders();
+    </script>
+    
+    <style>
+        .status { padding: 0.25rem 0.75rem; border-radius: 4px; color: white; }
+        .status-pendiente { background: #f39c12; }
+        .status-completado { background: #27ae60; }
+        .status-cancelado { background: #e74c3c; }
+    </style>
+</body>
+</html>

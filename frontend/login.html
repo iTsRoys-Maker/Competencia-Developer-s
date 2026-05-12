@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - ElectroShop</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { corePlugins: { preflight: false } }
+    </script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-card">
+            <h2>Iniciar Sesion</h2>
+            <div id="message"></div>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Contrasena:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Entrar</button>
+            </form>
+
+            <p class="form-footer">
+                No tienes cuenta? <a href="register.html">Registrate</a>
+            </p>
+        </div>
+
+        <div class="test-accounts">
+            <h3>Cuentas de prueba:</h3>
+            <p><strong>Admin:</strong> admin@ecommerce.com / admin123</p>
+            <p><strong>Cliente:</strong> juan@email.com / cliente123</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch(API_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    saveToken(data.token, data);
+                    messageDiv.innerHTML = '<p class="success">Login exitoso!</p>';
+                    setTimeout(() => {
+                        if (data.rol === 'ADMIN') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'products.html';
+                        }
+                    }, 1000);
+                } else {
+                    messageDiv.innerHTML = '<p class="error">' + data.message + '</p>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<p class="error">Error de conexion. Asegurate de que el servidor este corriendo.</p>';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# 📤 Guía para el grupo — del repo al WhatsApp
+# Guía para el grupo — del repo al WhatsApp
 
 ## PASO 1 — Crear cuenta en GitHub (si no tienen)
 
@@ -46,7 +46,7 @@ git clone https://github.com/[usuario-dueño]/ecommerce-[nombre-proyecto].git
 cd ecommerce-[nombre-proyecto]
 ```
 
-> ⚠️ Si nunca han usado Git: descargar desde https://git-scm.com/downloads
+>  Si nunca han usado Git: descargar desde https://git-scm.com/downloads
 
 ---
 

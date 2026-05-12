@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ecommerce POO</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="products.html">Productos</a>
+            <a href="cart.html">Carrito (<span id="cart-count">0</span>)</a>
+            <a href="login.html">Iniciar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <h2>Nuestros Productos</h2>
+        <div id="products-container" class="products-grid">
+            <p>Cargando productos...</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        async function loadProducts() {
+            try {
+                const response = await fetch(API_URL + '/products');
+                const products = await response.json();
+                
+                const container = document.getElementById('products-container');
+                container.innerHTML = products.map(p => `
+                    <div class="product-card">
+                        <img src="${p.imagenUrl || 'https://via.placeholder.com/200'}" alt="${p.nombre}">
+                        <h3>${p.nombre}</h3>
+                        <p>${p.descripcion || ''}</p>
+                        <p class="price">$${parseFloat(p.precio).toFixed(2)}</p>
+                        <p class="stock">Stock: ${p.stock}</p>
+                        <button onclick="addToCart(${p.id})" class="btn">Agregar al Carrito</button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('products-container').innerHTML = 
+                    '<p class="error">Error al cargar productos. Asegurate de que el servidor este corriendo.</p>';
+            }
+        }
+        
+        async function addToCart(productId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Debes iniciar sesion primero');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL + '/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: JSON.stringify({ productoId: productId, cantidad: 1 })
+                });
+                
+                if (response.ok) {
+                    alert('Producto agregado al carrito');
+                    updateCartCount();
+                }
+            } catch (error) {
+                alert('Error al agregar al carrito');
+            }
+        }
+        
+        async function updateCartCount() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    const response = await fetch(API_URL + '/cart', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+                    if (response.ok) {
+                        const cart = await response.json();
+                        document.getElementById('cart-count').textContent = cart.cantidadTotal || 0;
+                    }
+                } catch (e) {}
+            }
+        }
+        
+        loadProducts();
+        updateCartCount();
+    </script>
+</body>
+</html>

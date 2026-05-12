@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ecommerce POO</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Ecommerce POO</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="products.html">Productos</a>
+            <a href="login.html">Iniciar Sesion</a>
+        </nav>
+    </header>
+    
+    <main>
+        <form id="login-form">
+            <h2>Iniciar Sesion</h2>
+            <div id="message"></div>
+            
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Contrasena:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <button type="submit" class="btn">Entrar</button>
+            <p style="text-align: center; margin-top: 1rem;">
+                No tienes cuenta? <a href="register.html">Registrate</a>
+            </p>
+        </form>
+        
+        <div style="max-width: 400px; margin: 2rem auto; background: #f0f0f0; padding: 1rem; border-radius: 8px;">
+            <h3>Cuentas de prueba:</h3>
+            <p><strong>Admin:</strong> admin@ecommerce.com / admin123</p>
+            <p><strong>Cliente:</strong> juan@email.com / cliente123</p>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
+    </footer>
+    
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(API_URL + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    saveToken(data.token, data);
+                    messageDiv.innerHTML = '<p class="success">Login exitoso!</p>';
+                    setTimeout(() => {
+                        if (data.rol === 'ADMIN') {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'products.html';
+                        }
+                    }, 1000);
+                } else {
+                    messageDiv.innerHTML = '<p class="error">' + data.message + '</p>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<p class="error">Error de conexion. Asegurate de que el servidor este corriendo.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
