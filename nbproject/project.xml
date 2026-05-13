@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xml:id="project.xml" name="ecommerce-poo">
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/maven2/1">
+            <conf-dir>${user.home}/.m2/repository</conf-dir>
+            <name>ecommerce-poo</name>
+            <type>pom</type>
+        </data>
+    </configuration>
+</project>

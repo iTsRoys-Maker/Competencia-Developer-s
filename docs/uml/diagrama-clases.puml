@@ -1,0 +1,133 @@
+@startuml
+skinparam style strictuml
+skinparam backgroundColor #F8FAFC
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #2563EB
+skinparam classFontColor #0F172A
+skinparam classHeaderBackgroundColor #2563EB
+skinparam classHeaderFontColor #FFFFFF
+skinparam arrowColor #2563EB
+skinparam shadowing false
+
+title "Diagrama de Clases - ElectroShop"
+
+abstract class Usuario {
+  - id: Long
+  - nombre: String
+  - email: String
+  - password: String
+  - rol: String
+  ..
+  + {abstract} getTipoUsuario(): String
+  + toString(): String
+}
+
+class Cliente {
+  - telefono: String
+  - direccion: String
+  ..
+  + getTipoUsuario(): String
+}
+
+class Administrador {
+  - departamento: String
+  ..
+  + getTipoUsuario(): String
+}
+
+class Producto {
+  - id: Long
+  - nombre: String
+  - descripcion: String
+  - precio: BigDecimal
+  - stock: Integer
+  - imagenUrl: String
+  - categoria: String
+  ..
+  + tieneStock(): boolean
+  + tieneStockSuficiente(int): boolean
+  + reducirStock(int): void
+}
+
+class Carrito {
+  - id: Long
+  ..
+  + agregarItem(Producto, int): void
+  + removerItem(Long): void
+  + limpiar(): void
+  + getTotal(): BigDecimal
+  + getCantidadTotal(): int
+}
+
+class ItemCarrito {
+  - id: Long
+  - cantidad: Integer
+  ..
+  + getSubtotal(): BigDecimal
+}
+
+class Pedido {
+  - id: Long
+  - fechaPedido: LocalDateTime
+  - estado: String
+  - total: BigDecimal
+  - metodoPago: String
+  - direccionEnvio: String
+  ..
+  + agregarDetalle(Producto, int, BigDecimal): void
+  + calcularTotal(): void
+}
+
+class DetallePedido {
+  - id: Long
+  - cantidad: Integer
+  - precioUnitario: BigDecimal
+  ..
+  + getSubtotal(): BigDecimal
+}
+
+interface Pago {
+  + {abstract} procesar(BigDecimal): boolean
+  + {abstract} getMetodoPago(): String
+  + getDescripcion(): String
+}
+
+class PagoTarjeta {
+  - numeroTarjeta: String
+  - titular: String
+  - cvv: String
+  - fechaVencimiento: String
+  ..
+  + procesar(BigDecimal): boolean
+  + getMetodoPago(): String
+  - validarTarjeta(): boolean
+}
+
+class PagoContraEntrega {
+  - nombreReceptor: String
+  - telefonoContacto: String
+  ..
+  + procesar(BigDecimal): boolean
+  + getMetodoPago(): String
+  - validarDatos(): boolean
+}
+
+' Herencia: Usuario
+Usuario <|-- Cliente
+Usuario <|-- Administrador
+
+' Relaciones Carrito
+Cliente "1" -- "1" Carrito : tiene >
+Carrito "1" *-- "0..*" ItemCarrito : contiene >
+ItemCarrito "*" -- "1" Producto : referencia >
+
+' Relaciones Pedido
+Cliente "1" -- "0..*" Pedido : realiza >
+Pedido "1" *-- "0..*" DetallePedido : contiene >
+DetallePedido "*" -- "1" Producto : referencia >
+
+' Implementacion: Pago
+Pago <|.. PagoTarjeta
+Pago <|.. PagoContraEntrega
+
+@enduml

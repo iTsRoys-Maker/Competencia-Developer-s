@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito — Electronic Store</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }}}}</script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>Mi Carrito</h1>
+            <p>Revisa tus productos antes de confirmar</p>
+        </div>
+
+        <div class="checkout-layout">
+            <div>
+                <div id="cart-container"><p style="color:var(--text2)">Cargando carrito...</p></div>
+            </div>
+            <div>
+                <div id="checkout-section" style="display:none" class="order-summary">
+                    <div class="card fade-up">
+                        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem">Resumen del Pedido</h3>
+                        <div id="order-total" style="font-size:1.25rem;font-weight:800;color:var(--accent);margin-bottom:1.5rem"></div>
+                        <button onclick="abrirModalPago()" class="btn btn-primary" style="width:100%">
+                            Proceder al Pago
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal-overlay" style="display:none">
+        <div class="modal" style="max-width:560px">
+            <div class="modal-header">
+                <h3>Completar Pedido</h3>
+                <button onclick="cerrarModalPago()" class="modal-close" style="font-size:1.5rem">&times;</button>
+            </div>
+            <form id="checkout-form">
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" id="checkout-nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" id="checkout-telefono" placeholder="300 123 4567">
+                </div>
+                <div class="form-group">
+                    <label>Dirección de Envío</label>
+                    <input type="text" id="checkout-direccion" placeholder="Calle 123 #45-67, Barrio" required>
+                </div>
+                <div class="form-group">
+                    <label>Ciudad</label>
+                    <input type="text" id="checkout-ciudad" placeholder="Bogotá" required>
+                </div>
+                <div class="form-group">
+                    <label>Método de Pago</label>
+                    <select id="checkout-metodo" required>
+                        <option value="TARJETA">Tarjeta de Crédito/Débito</option>
+                        <option value="CONTRA_ENTREGA">Pago contra entrega (Efectivo)</option>
+                    </select>
+                </div>
+                <div id="checkout-tarjeta" style="display:none">
+                    <div class="form-group">
+                        <label>Número de Tarjeta</label>
+                        <input type="text" id="checkout-numero-tarjeta" placeholder="1234 5678 9012 3456">
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                        <div class="form-group">
+                            <label>Titular</label>
+                            <input type="text" id="checkout-titular" placeholder="Nombre del titular">
+                        </div>
+                        <div class="form-group">
+                            <label>CVV</label>
+                            <input type="text" id="checkout-cvv" placeholder="123">
+                        </div>
+                    </div>
+                </div>
+                <div id="checkout-contra-entrega" style="display:none">
+                    <div class="form-group">
+                        <label>Nombre del Receptor</label>
+                        <input type="text" id="checkout-receptor" placeholder="Quién recibe">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono de Contacto</label>
+                        <input type="text" id="checkout-contacto" placeholder="300 123 4567">
+                    </div>
+                </div>
+                <label style="display:flex;align-items:center;gap:.5rem;margin:1rem 0;font-size:.875rem;cursor:pointer">
+                    <input type="checkbox" id="checkout-actualizar-perfil" checked>
+                    Actualizar mis datos de envío
+                </label>
+                <button type="submit" class="btn btn-primary" style="width:100%">Confirmar Pedido</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Voucher / Invoice Modal -->
+    <div id="voucher-modal" class="modal-overlay" style="display:none">
+        <div class="voucher-card fade-up" style="background:var(--surface);padding:2rem;border-radius:1rem;max-width:600px;width:95%;box-shadow:var(--shadow-xl)">
+            <div id="voucher-print-area">
+                <div class="voucher-header" style="text-align:center;border-bottom:2px dashed var(--border);padding-bottom:1rem;margin-bottom:1.5rem">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:48px;height:48px;color:var(--success);margin:0 auto .5rem"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <h2 style="font-size:1.5rem;font-weight:800;color:var(--text)">¡Compra Exitosa!</h2>
+                    <p style="color:var(--text2);font-size:.9rem;margin-top:.25rem">Factura de Venta Electrónica</p>
+                </div>
+                <div id="voucher-content" style="font-size:.95rem;color:var(--text)">
+                </div>
+            </div>
+            <div class="voucher-actions no-print" style="margin-top:2rem;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+                <button onclick="window.print()" class="btn btn-outline">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:18px;height:18px"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                    Imprimir Factura
+                </button>
+                <button onclick="window.location.href='orders.html'" class="btn btn-primary">Ver mis Pedidos</button>
+                <button onclick="document.getElementById('voucher-modal').style.display='none'" class="btn btn-outline">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadCart() {
+            const token = getToken();
+            if (!token) { window.location.href = 'login.html'; return; }
+            try {
+                const res = await fetch(API_URL + '/cart', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) { window.location.href = 'login.html'; return; }
+                const cart = await res.json();
+                const container = document.getElementById('cart-container');
+                if (!cart.items || cart.items.length === 0) {
+                    container.innerHTML = `<div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                        <h3>Tu carrito está vacío</h3>
+                        <p>Explora nuestro catálogo y encuentra productos increíbles</p>
+                        <a href="products.html" class="btn btn-primary">Ver Productos</a>
+                    </div>`;
+                    return;
+                }
+                container.innerHTML = `<div class="table-wrap fade-up"><table>
+                    <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
+                    <tbody>${cart.items.map(item => `<tr>
+                        <td style="font-weight:600">${item.productoNombre}</td>
+                        <td>${formatCOP(item.precioUnitario)}</td>
+                        <td><span class="badge badge-info">${item.cantidad}</span></td>
+                        <td style="font-weight:700;color:var(--success)">${formatCOP(item.subtotal)}</td>
+                        <td><button onclick="removeFromCart(${item.productoId})" class="btn btn-danger btn-sm">Eliminar</button></td>
+                    </tr>`).join('')}</tbody>
+                    <tfoot><tr><td colspan="3" style="font-weight:700;text-align:right">Total:</td><td style="font-weight:800;font-size:1.1rem;color:var(--accent)">${formatCOP(cart.total)}</td><td></td></tr></tfoot>
+                </table></div>`;
+                const el = document.getElementById('cart-count');
+                if (el) el.textContent = cart.cantidadTotal || 0;
+                document.getElementById('checkout-section').style.display = 'block';
+                document.getElementById('order-total').textContent = 'Total: ' + formatCOP(cart.total);
+                window.cartTotal = cart.total;
+            } catch (error) {
+                document.getElementById('cart-container').innerHTML = '<div class="msg msg-error">Error al cargar el carrito.</div>';
+            }
+        }
+
+        async function removeFromCart(productId) {
+            const token = getToken();
+            try {
+                await fetch(API_URL + '/cart/remove/' + productId, {
+                    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
+                });
+                showToast('Producto eliminado', 'info');
+                loadCart();
+            } catch (e) { showToast('Error al eliminar', 'error'); }
+        }
+
+        async function abrirModalPago() {
+            const token = getToken();
+            document.getElementById('checkout-modal').style.display = 'flex';
+
+            // Pre-fill form with profile data (recurring customer logic)
+            try {
+                const res = await fetch(API_URL + '/user/profile', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const profile = await res.json();
+                    if (profile.nombre) document.getElementById('checkout-nombre').value = profile.nombre;
+                    if (profile.telefono) document.getElementById('checkout-telefono').value = profile.telefono;
+                    if (profile.direccion) {
+                        // Split stored address into address + city if comma-separated
+                        const parts = profile.direccion.split(',').map(s => s.trim());
+                        document.getElementById('checkout-direccion').value = parts[0] || '';
+                        if (parts.length > 1) {
+                            document.getElementById('checkout-ciudad').value = parts[parts.length - 1] || '';
+                        }
+                    }
+                }
+            } catch (e) { /* Profile endpoint optional — user fills manually */ }
+        }
+
+        function cerrarModalPago() {
+            document.getElementById('checkout-modal').style.display = 'none';
+        }
+
+        document.getElementById('checkout-metodo').addEventListener('change', function() {
+            document.getElementById('checkout-tarjeta').style.display = this.value === 'TARJETA' ? 'block' : 'none';
+            document.getElementById('checkout-contra-entrega').style.display = this.value === 'CONTRA_ENTREGA' ? 'block' : 'none';
+        });
+
+        document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = getToken();
+            const metodoPago = document.getElementById('checkout-metodo').value;
+            const direccion = document.getElementById('checkout-direccion').value.trim() + ', ' + document.getElementById('checkout-ciudad').value.trim();
+
+            const request = { direccionEnvio: direccion, metodoPago };
+
+            if (metodoPago === 'TARJETA') {
+                request.numeroTarjeta = document.getElementById('checkout-numero-tarjeta').value;
+                request.titular = document.getElementById('checkout-titular').value;
+                request.cvv = document.getElementById('checkout-cvv').value;
+            } else {
+                request.nombreReceptor = document.getElementById('checkout-receptor').value;
+                request.telefonoContacto = document.getElementById('checkout-contacto').value;
+            }
+
+            try {
+                const res = await fetch(API_URL + '/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    body: JSON.stringify(request)
+                });
+
+                if (res.ok) {
+                    const orderData = await res.json();
+
+                    // Capture checkout form data to enrich the voucher
+                    orderData._checkoutNombre = document.getElementById('checkout-nombre').value;
+                    orderData._checkoutTelefono = document.getElementById('checkout-telefono').value;
+                    orderData._checkoutCiudad = document.getElementById('checkout-ciudad').value;
+
+                    // Update profile if checkbox is checked
+                    if (document.getElementById('checkout-actualizar-perfil').checked) {
+                        const nombre = document.getElementById('checkout-nombre').value;
+                        const telefono = document.getElementById('checkout-telefono').value;
+                        const dir = document.getElementById('checkout-direccion').value + ', ' + document.getElementById('checkout-ciudad').value;
+                        await fetch(API_URL + '/user/profile', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            body: JSON.stringify({ nombre, telefono, direccion: dir })
+                        }).catch(() => {});
+                    }
+
+                    cerrarModalPago();
+                    mostrarVoucher(orderData);
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(err.message || 'No se pudo procesar el pedido', 'error');
+                }
+            } catch (e) { showToast('Error de conexión', 'error'); }
+        });
+
+        function mostrarVoucher(order) {
+            const date = new Date(order.fechaPedido).toLocaleString('es-CO');
+            const totalNum = typeof order.total === 'number' ? order.total : parseFloat(order.total);
+            const iva = Math.round(totalNum * 0.19);
+            const subtotal = totalNum - iva;
+
+            // Use checkout form data to enrich client info on the voucher
+            const clienteNombre = order._checkoutNombre || order.usuarioNombre || 'Cliente';
+            const clienteEmail = order.usuarioEmail || '';
+            const clienteTelefono = order._checkoutTelefono || '';
+            const clienteDireccion = order.direccionEnvio || '';
+            const metodoPagoLabel = order.metodoPago === 'TARJETA' ? 'Tarjeta de Crédito/Débito' : 'Pago Contra Entrega';
+
+            const html = `
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Factura:</span>
+                    <strong style="color:var(--accent);font-size:1.05rem">${order.facturaId || order.numeroOrden || ('#' + order.id)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Nº de Orden:</span>
+                    <strong style="color:var(--text)">${order.numeroOrden || ('#' + order.id)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Fecha:</span>
+                    <strong style="color:var(--text)">${date}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Método de Pago:</span>
+                    <strong style="color:var(--text)">${metodoPagoLabel}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:1.25rem">
+                    <span style="color:var(--text2)">Estado:</span>
+                    <strong style="color:var(--success)">PAGADO / ${order.estado}</strong>
+                </div>
+
+                <div style="border-top:1px solid var(--border);padding:.75rem 0;margin-bottom:.75rem">
+                    <strong style="display:block;margin-bottom:.5rem;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">Datos del Cliente</strong>
+                    <div style="font-size:.85rem;color:var(--text);font-weight:600">${clienteNombre}</div>
+                    <div style="font-size:.8rem;color:var(--text2)">${clienteEmail}</div>
+                    ${clienteTelefono ? `<div style="font-size:.8rem;color:var(--text2)">Tel: ${clienteTelefono}</div>` : ''}
+                    <div style="font-size:.8rem;color:var(--text2)">Envío: ${clienteDireccion}</div>
+                </div>
+
+                <div style="border-top:2px solid var(--text);border-bottom:2px solid var(--text);margin-bottom:1rem">
+                    <table style="width:100%;font-size:.85rem;border-collapse:collapse">
+                        <thead>
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <th style="text-align:left;padding:.5rem .25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">Producto</th>
+                                <th style="text-align:center;padding:.5rem .25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">Cant</th>
+                                <th style="text-align:right;padding:.5rem .25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">P.Unit</th>
+                                <th style="text-align:right;padding:.5rem .25rem;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text2)">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(order.detalles || []).map(d => `
+                                <tr>
+                                    <td style="padding:.5rem .25rem">${d.productoNombre || 'Producto'}</td>
+                                    <td style="text-align:center;padding:.5rem .25rem">${d.cantidad}</td>
+                                    <td style="text-align:right;padding:.5rem .25rem">${formatCOP(d.precioUnitario)}</td>
+                                    <td style="text-align:right;padding:.5rem .25rem;font-weight:600">${formatCOP(d.precioUnitario * d.cantidad)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display:flex;flex-direction:column;gap:.25rem;font-size:.9rem">
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="color:var(--text2)">Subtotal (sin IVA)</span>
+                        <span>${formatCOP(subtotal)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between">
+                        <span style="color:var(--text2)">IVA 19%</span>
+                        <span>${formatCOP(iva)}</span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:800;border-top:2px solid var(--accent);padding-top:.5rem;margin-top:.25rem">
+                        <span>Total Pagado</span>
+                        <span style="color:var(--accent)">${formatCOP(totalNum)}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.25rem;padding-top:.75rem;border-top:1px dashed var(--border);font-size:.75rem;color:var(--text2);text-align:center">
+                    <p><strong>ELECTRONIC STORE S.A.S.</strong> — NIT 901.234.567-8</p>
+                    <p>Calle 123 #45-67, Bogotá, Colombia — Tel: +57 1 234 5678</p>
+                    <p style="margin-top:.25rem">Factura de venta electrónica — Resolución DIAN No. 18764 del 2025-01-15</p>
+                    <p>Sujeto a retención según estatuto tributario</p>
+                </div>
+            `;
+            document.getElementById('voucher-content').innerHTML = html;
+            document.getElementById('voucher-modal').style.display = 'flex';
+        }
+
+        loadCart();
+
+        document.getElementById('checkout-modal').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModalPago();
+        });
+        document.getElementById('voucher-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

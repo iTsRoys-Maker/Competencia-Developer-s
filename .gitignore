@@ -1,0 +1,35 @@
+# Compilados
+*.class
+*.jar
+target/
+build/
+out/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+nbproject/private/
+.settings/
+.classpath
+.project
+
+# Credenciales — NUNCA subir
+*.env
+application-local.properties
+secrets.properties
+
+# SO
+.DS_Store
+Thumbs.db
+
+# Maven / Gradle
+.gradle/
+gradlew
+gradlew.bat
+mvnw
+mvnw.cmd
+
+# BD local
+*.db
+*.sqlite
