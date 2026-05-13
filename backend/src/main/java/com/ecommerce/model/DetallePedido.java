@@ -2,6 +2,7 @@ package com.ecommerce.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "detalles_pedido")
@@ -11,6 +12,7 @@ public class DetallePedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "pedido_id")
     private Pedido pedido;

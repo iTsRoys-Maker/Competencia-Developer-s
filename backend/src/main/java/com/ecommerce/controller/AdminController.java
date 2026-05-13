@@ -12,6 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AdminController {
     
     private final PedidoService pedidoService;

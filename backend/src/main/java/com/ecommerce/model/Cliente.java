@@ -3,6 +3,7 @@ package com.ecommerce.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "clientes")
@@ -14,7 +15,8 @@ public class Cliente extends Usuario {
     @Column(name = "direccion")
     private String direccion;
     
-    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pedido> pedidos = new ArrayList<>();
     
     public Cliente() {

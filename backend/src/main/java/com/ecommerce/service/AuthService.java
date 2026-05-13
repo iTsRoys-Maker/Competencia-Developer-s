@@ -52,6 +52,9 @@ public class AuthService {
             );
             admin = administradorRepository.save(admin);
             
+            Carrito carrito = new Carrito(admin);
+            carritoRepository.save(carrito);
+            
             String token = jwtUtil.generateToken(admin.getEmail(), admin.getRol(), admin.getId());
             return new AuthResponse(token, admin.getEmail(), admin.getRol(), admin.getNombre(), admin.getId());
         } else {

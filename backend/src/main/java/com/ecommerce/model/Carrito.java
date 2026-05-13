@@ -14,22 +14,22 @@ public class Carrito {
     private Long id;
     
     @OneToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
     
     @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemCarrito> items = new ArrayList<>();
     
     public Carrito() {}
     
-    public Carrito(Cliente cliente) {
-        this.cliente = cliente;
+    public Carrito(Usuario usuario) {
+        this.usuario = usuario;
     }
     
     @Override
     public String toString() {
-        return String.format("Carrito{id=%d, cliente=%s, items=%d}", 
-            id, cliente.getNombre(), items.size());
+        return String.format("Carrito{id=%d, usuario=%s, items=%d}", 
+            id, usuario.getNombre(), items.size());
     }
     
     public void agregarItem(Producto producto, int cantidad) {
@@ -66,8 +66,8 @@ public class Carrito {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     
     public List<ItemCarrito> getItems() { return items; }
     public void setItems(List<ItemCarrito> items) { this.items = items; }

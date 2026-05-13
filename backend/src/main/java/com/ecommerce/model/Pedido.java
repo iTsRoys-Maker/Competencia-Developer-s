@@ -15,8 +15,11 @@ public class Pedido {
     private Long id;
     
     @ManyToOne
-    @JoinColumn(name = "cliente_id")
-    private Cliente cliente;
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
+    
+    @Column(name = "numero_orden", unique = true)
+    private String numeroOrden;
     
     @Column(name = "fecha_pedido")
     private LocalDateTime fechaPedido;
@@ -38,8 +41,8 @@ public class Pedido {
     
     public Pedido() {}
     
-    public Pedido(Cliente cliente, String direccionEnvio) {
-        this.cliente = cliente;
+    public Pedido(Usuario usuario, String direccionEnvio) {
+        this.usuario = usuario;
         this.fechaPedido = LocalDateTime.now();
         this.estado = "PENDIENTE";
         this.direccionEnvio = direccionEnvio;
@@ -47,8 +50,8 @@ public class Pedido {
     
     @Override
     public String toString() {
-        return String.format("Pedido{id=%d, cliente=%s, estado=%s, total=%s}", 
-            id, cliente.getNombre(), estado, total);
+        return String.format("Pedido{id=%d, numeroOrden='%s', usuario=%s, estado=%s, total=%s}", 
+            id, numeroOrden, usuario.getNombre(), estado, total);
     }
     
     public void agregarDetalle(Producto producto, int cantidad, BigDecimal precioUnitario) {
@@ -65,8 +68,11 @@ public class Pedido {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     
-    public Cliente getCliente() { return cliente; }
-    public void setCliente(Cliente cliente) { this.cliente = cliente; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    
+    public String getNumeroOrden() { return numeroOrden; }
+    public void setNumeroOrden(String numeroOrden) { this.numeroOrden = numeroOrden; }
     
     public LocalDateTime getFechaPedido() { return fechaPedido; }
     public void setFechaPedido(LocalDateTime fechaPedido) { this.fechaPedido = fechaPedido; }

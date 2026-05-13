@@ -1,6 +1,7 @@
 package com.ecommerce.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "usuarios")
@@ -17,6 +18,7 @@ public abstract class Usuario {
     @Column(nullable = false, unique = true)
     private String email;
     
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
     

@@ -27,19 +27,19 @@ public class CarritoService {
         this.productoRepository = productoRepository;
     }
     
-    public Carrito getCarritoPorClienteId(Long clienteId) {
-        return carritoRepository.findByClienteId(clienteId)
-            .orElseThrow(() -> new RecursoNoEncontradoException("Carrito no encontrado para el cliente"));
+    public Carrito getCarritoPorUsuarioId(Long usuarioId) {
+        return carritoRepository.findByUsuarioId(usuarioId)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Carrito no encontrado para el usuario"));
     }
     
-    public CarritoResponse getCarritoResponse(Long clienteId) {
-        Carrito carrito = getCarritoPorClienteId(clienteId);
+    public CarritoResponse getCarritoResponse(Long usuarioId) {
+        Carrito carrito = getCarritoPorUsuarioId(usuarioId);
         return convertirACarritoResponse(carrito);
     }
     
     @Transactional
-    public CarritoResponse agregarAlCarrito(Long clienteId, AddToCartRequest request) {
-        Carrito carrito = getCarritoPorClienteId(clienteId);
+    public CarritoResponse agregarAlCarrito(Long usuarioId, AddToCartRequest request) {
+        Carrito carrito = getCarritoPorUsuarioId(usuarioId);
         Producto producto = productoRepository.findById(request.getProductoId())
             .orElseThrow(() -> new RecursoNoEncontradoException("Producto", request.getProductoId()));
         
@@ -58,8 +58,8 @@ public class CarritoService {
     }
     
     @Transactional
-    public CarritoResponse removerDelCarrito(Long clienteId, Long productoId) {
-        Carrito carrito = getCarritoPorClienteId(clienteId);
+    public CarritoResponse removerDelCarrito(Long usuarioId, Long productoId) {
+        Carrito carrito = getCarritoPorUsuarioId(usuarioId);
         carrito.removerItem(productoId);
         carrito = carritoRepository.save(carrito);
         
@@ -67,8 +67,8 @@ public class CarritoService {
     }
     
     @Transactional
-    public CarritoResponse limpiarCarrito(Long clienteId) {
-        Carrito carrito = getCarritoPorClienteId(clienteId);
+    public CarritoResponse limpiarCarrito(Long usuarioId) {
+        Carrito carrito = getCarritoPorUsuarioId(usuarioId);
         carrito.limpiar();
         carrito = carritoRepository.save(carrito);
         
@@ -76,8 +76,8 @@ public class CarritoService {
     }
     
     @Transactional
-    public void validarCarrito(Long clienteId) {
-        Carrito carrito = getCarritoPorClienteId(clienteId);
+    public void validarCarrito(Long usuarioId) {
+        Carrito carrito = getCarritoPorUsuarioId(usuarioId);
         
         if (carrito.getItems().isEmpty()) {
             throw new CarritoVacioException();
@@ -98,7 +98,7 @@ public class CarritoService {
     private CarritoResponse convertirACarritoResponse(Carrito carrito) {
         CarritoResponse response = new CarritoResponse();
         response.setId(carrito.getId());
-        response.setClienteNombre(carrito.getCliente().getNombre());
+        response.setClienteNombre(carrito.getUsuario().getNombre());
         response.setTotal(carrito.getTotal());
         response.setCantidadTotal(carrito.getCantidadTotal());
         

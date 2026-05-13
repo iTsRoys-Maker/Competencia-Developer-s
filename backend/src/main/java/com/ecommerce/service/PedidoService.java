@@ -9,6 +9,7 @@ import com.ecommerce.repository.PedidoRepository;
 import com.ecommerce.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -35,10 +36,10 @@ public class PedidoService {
     }
     
     @Transactional
-    public Pedido crearPedido(Long clienteId, CreateOrderRequest request) {
-        carritoService.validarCarrito(clienteId);
+    public Pedido crearPedido(Long usuarioId, CreateOrderRequest request) {
+        carritoService.validarCarrito(usuarioId);
         
-        Carrito carrito = carritoRepository.findByClienteId(clienteId)
+        Carrito carrito = carritoRepository.findByUsuarioId(usuarioId)
             .orElseThrow(() -> new RecursoNoEncontradoException("Carrito no encontrado"));
         
         if (carrito.getItems().isEmpty()) {
@@ -51,8 +52,9 @@ public class PedidoService {
             throw new IllegalStateException("Error al procesar el pago");
         }
         
-        Pedido pedido = new Pedido(carrito.getCliente(), request.getDireccionEnvio());
+        Pedido pedido = new Pedido(carrito.getUsuario(), request.getDireccionEnvio());
         pedido.setMetodoPago(pago.getMetodoPago());
+        pedido.setNumeroOrden("ORD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         
         for (ItemCarrito item : carrito.getItems()) {
             Producto producto = item.getProducto();
@@ -72,8 +74,8 @@ public class PedidoService {
         return pedido;
     }
     
-    public List<Pedido> getPedidosPorCliente(Long clienteId) {
-        return pedidoRepository.findByClienteIdOrderByFechaPedidoDesc(clienteId);
+    public List<Pedido> getPedidosPorUsuario(Long usuarioId) {
+        return pedidoRepository.findByUsuarioIdOrderByFechaPedidoDesc(usuarioId);
     }
     
     public List<Pedido> getTodosLosPedidos() {

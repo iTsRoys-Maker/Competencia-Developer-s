@@ -3,67 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Ecommerce POO</title>
+    <title>Crear Cuenta — Electronic Store</title>
     <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }}}}</script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Ecommerce POO</h1>
-        <nav>
-            <a href="index.html">Inicio</a>
-            <a href="products.html">Productos</a>
-            <a href="login.html">Iniciar Sesion</a>
-        </nav>
-    </header>
-    
-    <main>
-        <form id="register-form">
+    <div class="container" style="display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 160px)">
+        <div class="form-card fade-up" style="max-width:480px">
             <h2>Crear Cuenta</h2>
+            <p class="subtitle">Únete a Electronic Store y descubre lo mejor en tecnología</p>
             <div id="message"></div>
-            
-            <div class="form-group">
-                <label>Nombre:</label>
-                <input type="text" id="nombre" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="email" id="email" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Contrasena:</label>
-                <input type="password" id="password" required minlength="6">
-            </div>
-            
-            <div class="form-group">
-                <label>Telefono:</label>
-                <input type="text" id="telefono">
-            </div>
-            
-            <div class="form-group">
-                <label>Direccion:</label>
-                <input type="text" id="direccion">
-            </div>
-            
-            <button type="submit" class="btn">Registrarse</button>
-            <p style="text-align: center; margin-top: 1rem;">
-                Ya tienes cuenta? <a href="login.html">Inicia Sesion</a>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre completo</label>
+                    <div class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+                        <input type="text" id="nombre" placeholder="Tu nombre" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                        <input type="email" id="email" placeholder="tu@email.com" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                        <input type="password" id="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" id="telefono" placeholder="300 123 4567">
+                    </div>
+                    <div class="form-group">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" id="direccion" placeholder="Tu dirección">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;margin-top:.5rem">Crear Cuenta</button>
+            </form>
+
+            <p class="form-footer">
+                ¿Ya tienes cuenta? <a href="login.html">Iniciar Sesión</a>
             </p>
-        </form>
-    </main>
-    
-    <footer>
-        <p>&copy; 2026 Ecommerce POO - Proyecto Academico</p>
-    </footer>
-    
-    <script src="js/api.js"></script>
+        </div>
+    </div>
+
     <script>
         document.getElementById('register-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const messageDiv = document.getElementById('message');
             messageDiv.innerHTML = '';
-            
             const data = {
                 nombre: document.getElementById('nombre').value,
                 email: document.getElementById('email').value,
@@ -72,25 +71,22 @@
                 direccion: document.getElementById('direccion').value,
                 rol: 'CLIENTE'
             };
-            
             try {
-                const response = await fetch(API_URL + '/auth/register', {
+                const res = await fetch(API_URL + '/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
+                const result = await res.json();
+                if (res.ok) {
                     saveToken(result.token, result);
-                    messageDiv.innerHTML = '<p class="success">Registro exitoso!</p>';
-                    setTimeout(() => window.location.href = 'products.html', 1000);
+                    messageDiv.innerHTML = '<div class="msg msg-success">✓ Registro exitoso! Redirigiendo...</div>';
+                    setTimeout(() => window.location.href = 'products.html', 800);
                 } else {
-                    messageDiv.innerHTML = '<p class="error">' + result.message + '</p>';
+                    messageDiv.innerHTML = `<div class="msg msg-error">✕ ${result.message || 'Error en el registro'}</div>`;
                 }
             } catch (error) {
-                messageDiv.innerHTML = '<p class="error">Error de conexion.</p>';
+                messageDiv.innerHTML = '<div class="msg msg-error">✕ Error de conexión.</div>';
             }
         });
     </script>

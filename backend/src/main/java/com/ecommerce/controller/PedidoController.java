@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PedidoController {
     
     private final PedidoService pedidoService;
@@ -26,15 +27,15 @@ public class PedidoController {
     public ResponseEntity<Pedido> crearPedido(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody CreateOrderRequest request) {
-        Long clienteId = extraerUsuarioId(authHeader);
-        Pedido pedido = pedidoService.crearPedido(clienteId, request);
+        Long usuarioId = extraerUsuarioId(authHeader);
+        Pedido pedido = pedidoService.crearPedido(usuarioId, request);
         return ResponseEntity.ok(pedido);
     }
     
     @GetMapping("/my-orders")
     public ResponseEntity<List<Pedido>> getMisPedidos(@RequestHeader("Authorization") String authHeader) {
-        Long clienteId = extraerUsuarioId(authHeader);
-        List<Pedido> pedidos = pedidoService.getPedidosPorCliente(clienteId);
+        Long usuarioId = extraerUsuarioId(authHeader);
+        List<Pedido> pedidos = pedidoService.getPedidosPorUsuario(usuarioId);
         return ResponseEntity.ok(pedidos);
     }
     

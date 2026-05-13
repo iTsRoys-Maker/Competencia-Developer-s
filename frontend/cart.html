@@ -3,63 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carrito - ElectroShop</title>
+    <title>Carrito — Electronic Store</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = { corePlugins: { preflight: false } }
-    </script>
+    <script>tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }}}}</script>
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
 </head>
 <body>
     <div class="container">
-        <h2 class="page-title">Mi Carrito de Compras</h2>
-        <div id="cart-container">
-            <p>Cargando carrito...</p>
+        <div class="page-header">
+            <h1>Mi Carrito</h1>
+            <p>Revisa tus productos antes de confirmar</p>
         </div>
 
-        <div id="checkout-section" style="display: none;">
-            <div class="card">
-                <h3>Confirmar Pedido</h3>
-                <form id="order-form">
-                    <div class="form-group">
-                        <label>Direccion de Envio:</label>
-                        <input type="text" id="direccion" required>
+        <div class="checkout-layout">
+            <div>
+                <div id="cart-container"><p style="color:var(--text2)">Cargando carrito...</p></div>
+            </div>
+            <div>
+                <div id="checkout-section" style="display:none" class="order-summary">
+                    <div class="card fade-up">
+                        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:1.25rem">Resumen del Pedido</h3>
+                        <div id="order-total" style="font-size:1.25rem;font-weight:800;color:var(--accent);margin-bottom:1.5rem"></div>
+                        <form id="order-form">
+                            <div class="form-group">
+                                <label for="direccion">Dirección de Envío</label>
+                                <input type="text" id="direccion" placeholder="Tu dirección completa" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="metodo-pago">Método de Pago</label>
+                                <select id="metodo-pago" required>
+                                    <option value="TARJETA">Tarjeta de Crédito/Débito</option>
+                                    <option value="CONTRA_ENTREGA">Contra Entrega</option>
+                                </select>
+                            </div>
+                            <div id="pago-tarjeta" style="display:none">
+                                <div class="form-group">
+                                    <label for="numero-tarjeta">Número de Tarjeta</label>
+                                    <input type="text" id="numero-tarjeta" placeholder="1234 5678 9012 3456">
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+                                    <div class="form-group">
+                                        <label for="titular">Titular</label>
+                                        <input type="text" id="titular" placeholder="Nombre">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cvv">CVV</label>
+                                        <input type="text" id="cvv" placeholder="123">
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="pago-contra-entrega" style="display:none">
+                                <div class="form-group">
+                                    <label for="nombre-receptor">Nombre del Receptor</label>
+                                    <input type="text" id="nombre-receptor">
+                                </div>
+                                <div class="form-group">
+                                    <label for="telefono-contacto">Teléfono</label>
+                                    <input type="text" id="telefono-contacto">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width:100%">Confirmar Pedido</button>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <label>Metodo de Pago:</label>
-                        <select id="metodo-pago" required>
-                            <option value="TARJETA">Tarjeta de Credito/Debito</option>
-                            <option value="CONTRA_ENTREGA">Contra Entrega</option>
-                        </select>
-                    </div>
-                    <div id="pago-tarjeta" style="display: none;">
-                        <div class="form-group">
-                            <label>Numero de Tarjeta:</label>
-                            <input type="text" id="numero-tarjeta" placeholder="1234567890123456">
-                        </div>
-                        <div class="form-group">
-                            <label>Titular:</label>
-                            <input type="text" id="titular">
-                        </div>
-                        <div class="form-group">
-                            <label>CVV:</label>
-                            <input type="text" id="cvv" placeholder="123">
-                        </div>
-                    </div>
-                    <div id="pago-contra-entrega" style="display: none;">
-                        <div class="form-group">
-                            <label>Nombre del Receptor:</label>
-                            <input type="text" id="nombre-receptor">
-                        </div>
-                        <div class="form-group">
-                            <label>Telefono:</label>
-                            <input type="text" id="telefono-contacto">
-                        </div>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
-                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voucher Modal -->
+    <div id="voucher-modal" class="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;z-index:50">
+        <div class="voucher-card fade-up" style="background:var(--surface);padding:2rem;border-radius:1rem;max-width:500px;width:90%;box-shadow:var(--shadow-xl)">
+            <div class="voucher-header" style="text-align:center;border-bottom:2px dashed var(--border);padding-bottom:1rem;margin-bottom:1.5rem">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width:48px;height:48px;color:var(--success);margin:0 auto .5rem"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <h2 style="font-size:1.5rem;font-weight:800;color:var(--text)">¡Compra Exitosa!</h2>
+                <p style="color:var(--text2);font-size:.9rem;margin-top:.25rem">Comprobante de Pago Electrónico</p>
+            </div>
+            <div id="voucher-content" style="font-size:.95rem;color:var(--text)">
+                <!-- Content injected via JS -->
+            </div>
+            <div class="voucher-actions no-print" style="margin-top:2rem;display:flex;gap:1rem;justify-content:center">
+                <button onclick="window.print()" class="btn btn-outline">🖨️ Imprimir</button>
+                <button onclick="window.location.href='orders.html'" class="btn btn-primary">Ver mis Pedidos</button>
             </div>
         </div>
     </div>
@@ -67,61 +93,40 @@
     <script>
         async function loadCart() {
             const token = getToken();
-            if (!token) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!token) { window.location.href = 'login.html'; return; }
             try {
-                const response = await fetch(API_URL + '/cart', {
+                const res = await fetch(API_URL + '/cart', {
                     headers: { 'Authorization': 'Bearer ' + token }
                 });
-                if (!response.ok) {
-                    window.location.href = 'login.html';
-                    return;
-                }
-                const cart = await response.json();
+                if (!res.ok) { window.location.href = 'login.html'; return; }
+                const cart = await res.json();
                 const container = document.getElementById('cart-container');
                 if (!cart.items || cart.items.length === 0) {
-                    container.innerHTML = '<p>Tu carrito esta vacio.</p><a href="products.html" class="btn btn-primary">Ver Productos</a>';
+                    container.innerHTML = `<div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                        <h3>Tu carrito está vacío</h3>
+                        <p>Explora nuestro catálogo y encuentra productos increíbles</p>
+                        <a href="products.html" class="btn btn-primary">Ver Productos</a>
+                    </div>`;
                     return;
                 }
-                container.innerHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Precio</th>
-                                <th>Cantidad</th>
-                                <th>Subtotal</th>
-                                <th>Accion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${cart.items.map(item => `
-                                <tr>
-                                    <td>${item.productoNombre}</td>
-                                    <td>${formatCOP(item.precioUnitario)}</td>
-                                    <td>${item.cantidad}</td>
-                                    <td>${formatCOP(item.subtotal)}</td>
-                                    <td>
-                                        <button onclick="removeFromCart(${item.productoId})" class="btn btn-danger" style="padding: 6px 12px;">Eliminar</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3"><strong>Total:</strong></td>
-                                <td><strong>${formatCOP(cart.total)}</strong></td>
-                                <td></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                `;
-                document.getElementById('cart-count').textContent = cart.cantidadTotal || 0;
+                container.innerHTML = `<div class="table-wrap fade-up"><table>
+                    <thead><tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr></thead>
+                    <tbody>${cart.items.map(item => `<tr>
+                        <td style="font-weight:600">${item.productoNombre}</td>
+                        <td>${formatCOP(item.precioUnitario)}</td>
+                        <td><span class="badge badge-info">${item.cantidad}</span></td>
+                        <td style="font-weight:700;color:var(--success)">${formatCOP(item.subtotal)}</td>
+                        <td><button onclick="removeFromCart(${item.productoId})" class="btn btn-danger btn-sm">Eliminar</button></td>
+                    </tr>`).join('')}</tbody>
+                    <tfoot><tr><td colspan="3" style="font-weight:700;text-align:right">Total:</td><td style="font-weight:800;font-size:1.1rem;color:var(--accent)">${formatCOP(cart.total)}</td><td></td></tr></tfoot>
+                </table></div>`;
+                const el = document.getElementById('cart-count');
+                if (el) el.textContent = cart.cantidadTotal || 0;
                 document.getElementById('checkout-section').style.display = 'block';
+                document.getElementById('order-total').textContent = 'Total: ' + formatCOP(cart.total);
             } catch (error) {
-                document.getElementById('cart-container').innerHTML = '<p class="error">Error al cargar el carrito.</p>';
+                document.getElementById('cart-container').innerHTML = '<div class="msg msg-error">Error al cargar el carrito.</div>';
             }
         }
 
@@ -129,30 +134,23 @@
             const token = getToken();
             try {
                 await fetch(API_URL + '/cart/remove/' + productId, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': 'Bearer ' + token }
+                    method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token }
                 });
+                showToast('Producto eliminado', 'info');
                 loadCart();
-            } catch (error) {
-                alert('Error al eliminar producto');
-            }
+            } catch (e) { showToast('Error al eliminar', 'error'); }
         }
 
         document.getElementById('metodo-pago').addEventListener('change', function() {
-            document.getElementById('pago-tarjeta').style.display =
-                this.value === 'TARJETA' ? 'block' : 'none';
-            document.getElementById('pago-contra-entrega').style.display =
-                this.value === 'CONTRA_ENTREGA' ? 'block' : 'none';
+            document.getElementById('pago-tarjeta').style.display = this.value === 'TARJETA' ? 'block' : 'none';
+            document.getElementById('pago-contra-entrega').style.display = this.value === 'CONTRA_ENTREGA' ? 'block' : 'none';
         });
 
         document.getElementById('order-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const token = getToken();
             const metodoPago = document.getElementById('metodo-pago').value;
-            const request = {
-                direccionEnvio: document.getElementById('direccion').value,
-                metodoPago: metodoPago
-            };
+            const request = { direccionEnvio: document.getElementById('direccion').value, metodoPago };
             if (metodoPago === 'TARJETA') {
                 request.numeroTarjeta = document.getElementById('numero-tarjeta').value;
                 request.titular = document.getElementById('titular').value;
@@ -162,25 +160,53 @@
                 request.telefonoContacto = document.getElementById('telefono-contacto').value;
             }
             try {
-                const response = await fetch(API_URL + '/orders', {
+                const res = await fetch(API_URL + '/orders', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + token
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify(request)
                 });
-                if (response.ok) {
-                    alert('Pedido realizado con exito!');
-                    window.location.href = 'orders.html';
+                if (res.ok) {
+                    const orderData = await res.json();
+                    mostrarVoucher(orderData);
                 } else {
-                    const error = await response.json();
-                    alert('Error: ' + (error.message || 'No se pudo procesar el pedido'));
+                    const err = await res.json();
+                    showToast(err.message || 'No se pudo procesar el pedido', 'error');
                 }
-            } catch (error) {
-                alert('Error de conexion');
-            }
+            } catch (e) { showToast('Error de conexión', 'error'); }
         });
+
+        function mostrarVoucher(order) {
+            const date = new Date(order.fechaPedido).toLocaleString('es-CO');
+            const html = `
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Nº de Orden:</span>
+                    <strong style="color:var(--text)">${order.numeroOrden || ('#' + order.id)}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:.5rem">
+                    <span style="color:var(--text2)">Fecha:</span>
+                    <strong style="color:var(--text)">${date}</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:1.5rem">
+                    <span style="color:var(--text2)">Estado:</span>
+                    <strong style="color:var(--success)">PAGADO / ${order.estado}</strong>
+                </div>
+                <div style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1rem 0;margin-bottom:1.5rem">
+                    <strong style="display:block;margin-bottom:.75rem">Items:</strong>
+                    ${(order.detalles || []).map(d => `
+                        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:.25rem">
+                            <span>${d.cantidad}x ${d.producto?.nombre || 'Producto'}</span>
+                            <span>${formatCOP(d.precioUnitario * d.cantidad)}</span>
+                        </div>
+                    `).join('')}
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:1.25rem;font-weight:800">
+                    <span>Total Pagado:</span>
+                    <span style="color:var(--accent)">${formatCOP(order.total)}</span>
+                </div>
+            `;
+            document.getElementById('voucher-content').innerHTML = html;
+            document.getElementById('voucher-modal').style.display = 'flex';
+        }
 
         loadCart();
     </script>
