@@ -1,15 +1,15 @@
-# 🛒 [Nombre del proyecto]
+# 🛒 [ELECTRONIC STORE]
 
-> Proyecto final — Java POO · [Curso] · [2026]
+> Taller Competitivo — Java POO · [Curso] · [2026]
 
 ## 👥 Integrantes
 
 | Nombre | GitHub |
 |--------|--------|
-| [Nombre 1] | [@usuario](https://github.com/usuario) |
-| [Nombre 2] | [@usuario](https://github.com/usuario) |
-| [Nombre 3] | [@usuario](https://github.com/usuario) |
-  [Nombre 4] | [@usuario](https://github.com/usuario) |
+| [Roy] | [@iTsRoys-Maker](https://github.com/iTsRoys-Maker) |
+| [Duvan] | [@DuvanCastilloDeveloper](https://github.com/DuvanCastilloDeveloper) |
+| [Alvaro] | [@AlvaroToloza](https://github.com/AlvaroToloza) |
+  [Adrian] | [@usuario](https://github.com/usuario) |
 ---
 
 ## 📋 Descripción
