@@ -2,6 +2,7 @@ package com.ecommerce.controller;
 
 import com.ecommerce.config.JwtUtil;
 import com.ecommerce.dto.CreateOrderRequest;
+import com.ecommerce.dto.PedidoResponse;
 import com.ecommerce.model.Pedido;
 import com.ecommerce.service.PedidoService;
 import jakarta.validation.Valid;
@@ -24,25 +25,25 @@ public class PedidoController {
     }
     
     @PostMapping
-    public ResponseEntity<Pedido> crearPedido(
+    public ResponseEntity<PedidoResponse> crearPedido(
             @RequestHeader("Authorization") String authHeader,
             @Valid @RequestBody CreateOrderRequest request) {
         Long usuarioId = extraerUsuarioId(authHeader);
         Pedido pedido = pedidoService.crearPedido(usuarioId, request);
-        return ResponseEntity.ok(pedido);
+        return ResponseEntity.ok(pedidoService.toPedidoResponse(pedido));
     }
     
     @GetMapping("/my-orders")
-    public ResponseEntity<List<Pedido>> getMisPedidos(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<List<PedidoResponse>> getMisPedidos(@RequestHeader("Authorization") String authHeader) {
         Long usuarioId = extraerUsuarioId(authHeader);
         List<Pedido> pedidos = pedidoService.getPedidosPorUsuario(usuarioId);
-        return ResponseEntity.ok(pedidos);
+        return ResponseEntity.ok(pedidoService.toPedidoResponseList(pedidos));
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Pedido> getPedidoById(@PathVariable Long id) {
+    public ResponseEntity<PedidoResponse> getPedidoById(@PathVariable Long id) {
         Pedido pedido = pedidoService.getPedidoPorId(id);
-        return ResponseEntity.ok(pedido);
+        return ResponseEntity.ok(pedidoService.toPedidoResponse(pedido));
     }
     
     private Long extraerUsuarioId(String authHeader) {

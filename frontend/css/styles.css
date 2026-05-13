@@ -246,7 +246,11 @@ table td img{width:40px;height:40px;object-fit:cover;border-radius:.5rem}
 
 /* Print Styles for Voucher */
 @media print {
-    body * {
+    @page {
+        margin: 1.5cm;
+        size: A4;
+    }
+    body *, .navbar, footer, .toast-container, .checkout-layout, .page-header {
         visibility: hidden;
     }
     #voucher-modal, #voucher-modal * {
@@ -257,20 +261,45 @@ table td img{width:40px;height:40px;object-fit:cover;border-radius:.5rem}
         left: 0;
         top: 0;
         width: 100%;
-        background: none;
+        background: none !important;
+        backdrop-filter: none !important;
         display: block !important;
         align-items: flex-start;
     }
     .voucher-card {
-        box-shadow: none;
-        border: 1px solid #ddd;
+        box-shadow: none !important;
+        border: none !important;
         max-width: 100%;
         width: 100%;
         margin: 0;
-        padding: 0;
+        padding: 0 !important;
+        background: white !important;
+        color: black !important;
+    }
+    .voucher-card * {
+        color: black !important;
+    }
+    .voucher-card table,
+    .voucher-card table th,
+    .voucher-card table td {
+        color: black !important;
+        border-color: #ccc !important;
+    }
+    .voucher-card strong {
+        color: black !important;
+    }
+    .voucher-header h2 {
+        color: black !important;
+        -webkit-text-fill-color: black !important;
+    }
+    .voucher-header svg {
+        color: #059669 !important;
     }
     .no-print {
         display: none !important;
+    }
+    #voucher-modal .modal-overlay {
+        background: none !important;
     }
 }
 

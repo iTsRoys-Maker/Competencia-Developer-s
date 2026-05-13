@@ -3,6 +3,8 @@ package com.ecommerce.service;
 import com.ecommerce.dto.AuthResponse;
 import com.ecommerce.dto.LoginRequest;
 import com.ecommerce.dto.RegisterRequest;
+import com.ecommerce.dto.UpdateProfileRequest;
+import com.ecommerce.exception.RecursoNoEncontradoException;
 import com.ecommerce.exception.RegistroException;
 import com.ecommerce.model.*;
 import com.ecommerce.config.JwtUtil;
@@ -96,5 +98,25 @@ public class AuthService {
     public Cliente getClientePorEmail(String email) {
         return clienteRepository.findByEmail(email)
             .orElseThrow(() -> new RegistroException("Cliente no encontrado"));
+    }
+
+    public Cliente getClienteById(Long id) {
+        return clienteRepository.findById(id)
+            .orElseThrow(() -> new RecursoNoEncontradoException("Cliente", id));
+    }
+
+    @Transactional
+    public Cliente actualizarPerfil(Long usuarioId, UpdateProfileRequest request) {
+        Cliente cliente = getClienteById(usuarioId);
+        if (request.getNombre() != null && !request.getNombre().isBlank()) {
+            cliente.setNombre(request.getNombre());
+        }
+        if (request.getTelefono() != null) {
+            cliente.setTelefono(request.getTelefono());
+        }
+        if (request.getDireccion() != null) {
+            cliente.setDireccion(request.getDireccion());
+        }
+        return clienteRepository.save(cliente);
     }
 }

@@ -1,6 +1,8 @@
 package com.ecommerce.service;
 
 import com.ecommerce.dto.CreateOrderRequest;
+import com.ecommerce.dto.DetallePedidoResponse;
+import com.ecommerce.dto.PedidoResponse;
 import com.ecommerce.exception.CarritoVacioException;
 import com.ecommerce.exception.RecursoNoEncontradoException;
 import com.ecommerce.model.*;
@@ -9,6 +11,7 @@ import com.ecommerce.repository.PedidoRepository;
 import com.ecommerce.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Year;
 import java.util.UUID;
 
 import java.math.BigDecimal;
@@ -125,13 +128,11 @@ public class PedidoService {
     }
     
     public Map<String, Object> getEstadisticas() {
-        // Consultas optimizadas con JPA aggregate en lugar de filtrar en memoria
         long totalPedidos = pedidoRepository.count();
         long pendientes = pedidoRepository.countByEstadoIn(List.of("PENDIENTE"));
         long completados = pedidoRepository.countByEstadoIn(List.of("COMPLETADO"));
         long cancelados = pedidoRepository.countByEstadoIn(List.of("CANCELADO"));
         
-        // Total ventas: solo pedidos COMPLETADO (y PAGADO si existiera)
         BigDecimal totalVentas = pedidoRepository.sumTotalByEstadoIn(List.of("COMPLETADO"));
         
         Map<String, Object> stats = new HashMap<>();
@@ -142,5 +143,47 @@ public class PedidoService {
         stats.put("totalVentas", totalVentas);
         
         return stats;
+    }
+
+    public PedidoResponse toPedidoResponse(Pedido pedido) {
+        PedidoResponse response = new PedidoResponse();
+        response.setId(pedido.getId());
+        response.setNumeroOrden(pedido.getNumeroOrden());
+        response.setFacturaId("FAC-" + Year.now() + "-" + String.format("%04d", pedido.getId()));
+        response.setFechaPedido(pedido.getFechaPedido());
+        response.setEstado(pedido.getEstado());
+        response.setTotal(pedido.getTotal());
+        response.setMetodoPago(pedido.getMetodoPago());
+        response.setDireccionEnvio(pedido.getDireccionEnvio());
+
+        Usuario usuario = pedido.getUsuario();
+        if (usuario != null) {
+            response.setUsuarioId(usuario.getId());
+            response.setUsuarioNombre(usuario.getNombre());
+            response.setUsuarioEmail(usuario.getEmail());
+        }
+
+        response.setDetalles(pedido.getDetalles().stream()
+            .map(this::toDetalleResponse)
+            .collect(Collectors.toList()));
+
+        return response;
+    }
+
+    public DetallePedidoResponse toDetalleResponse(DetallePedido detalle) {
+        return new DetallePedidoResponse(
+            detalle.getId(),
+            detalle.getProducto().getId(),
+            detalle.getProducto().getNombre(),
+            detalle.getCantidad(),
+            detalle.getPrecioUnitario(),
+            detalle.getSubtotal()
+        );
+    }
+
+    public List<PedidoResponse> toPedidoResponseList(List<Pedido> pedidos) {
+        return pedidos.stream()
+            .map(this::toPedidoResponse)
+            .collect(Collectors.toList());
     }
 }

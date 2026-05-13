@@ -1,5 +1,6 @@
 package com.ecommerce.controller;
 
+import com.ecommerce.dto.PedidoResponse;
 import com.ecommerce.model.Pedido;
 import com.ecommerce.model.Producto;
 import com.ecommerce.service.PedidoService;
@@ -24,7 +25,7 @@ public class AdminController {
     }
     
     @GetMapping("/orders")
-    public ResponseEntity<List<Pedido>> getTodosLosPedidos(
+    public ResponseEntity<List<PedidoResponse>> getTodosLosPedidos(
             @RequestParam(required = false) String estado) {
         List<Pedido> pedidos;
         
@@ -34,16 +35,16 @@ public class AdminController {
             pedidos = pedidoService.getTodosLosPedidos();
         }
         
-        return ResponseEntity.ok(pedidos);
+        return ResponseEntity.ok(pedidoService.toPedidoResponseList(pedidos));
     }
     
     @PutMapping("/orders/{id}/status")
-    public ResponseEntity<Pedido> actualizarEstadoPedido(
+    public ResponseEntity<PedidoResponse> actualizarEstadoPedido(
             @PathVariable Long id,
             @RequestBody Map<String, String> body) {
         String nuevoEstado = body.get("estado");
         Pedido pedido = pedidoService.actualizarEstadoPedido(id, nuevoEstado);
-        return ResponseEntity.ok(pedido);
+        return ResponseEntity.ok(pedidoService.toPedidoResponse(pedido));
     }
     
     @GetMapping("/stats")

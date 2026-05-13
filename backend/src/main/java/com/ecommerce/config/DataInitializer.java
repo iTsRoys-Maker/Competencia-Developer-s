@@ -149,7 +149,121 @@ public class DataInitializer {
                     "Almacenamiento"
                 ));
                 
-                System.out.println("Productos creados: 8 (precios en COP)");
+                // ===== 12 PRODUCTOS ADICIONALES: Electrónica de Alta Gama =====
+
+                // --- Gaming Laptops ---
+                productoRepository.save(new Producto(
+                    "ASUS ROG Strix G16",
+                    "Laptop gaming ASUS ROG Strix G16, Intel Core i9-13980HX, RTX 4070, 16GB DDR5, 1TB SSD, pantalla 16\" QHD 240Hz",
+                    new BigDecimal("8499000"),
+                    5,
+                    "https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?w=600&h=450&fit=crop",
+                    "Gaming"
+                ));
+
+                productoRepository.save(new Producto(
+                    "MSI Raider GE78 HX",
+                    "Laptop gaming MSI Raider GE78 HX, Intel Core i9, RTX 4080, 32GB DDR5, 2TB SSD, pantalla 17\" UHD+ 144Hz",
+                    new BigDecimal("12990000"),
+                    3,
+                    "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=600&h=450&fit=crop",
+                    "Gaming"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Lenovo Legion Pro 7i",
+                    "Laptop gaming Lenovo Legion Pro 7i, Intel Core i9-13900HX, RTX 4090, 32GB DDR5, 1TB SSD, pantalla 16\" WQXGA 240Hz",
+                    new BigDecimal("14500000"),
+                    2,
+                    "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&h=450&fit=crop",
+                    "Gaming"
+                ));
+
+                // --- Periféricos Premium ---
+                productoRepository.save(new Producto(
+                    "Razer BlackWidow V4 Pro",
+                    "Teclado mecánico gaming Razer BlackWidow V4 Pro, switches Green, RGB Chroma, reposamuñecas magnético",
+                    new BigDecimal("1199000"),
+                    18,
+                    "https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&h=450&fit=crop",
+                    "Periféricos"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Logitech G Pro X Superlight 2",
+                    "Mouse gaming inalámbrico Logitech G Pro X Superlight 2, sensor HERO 2, 63g, 32K DPI, autonomía 95h",
+                    new BigDecimal("749000"),
+                    22,
+                    "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=600&h=450&fit=crop",
+                    "Periféricos"
+                ));
+
+                productoRepository.save(new Producto(
+                    "HyperX Cloud III Wireless",
+                    "Audífonos gaming inalámbricos HyperX Cloud III, DTS Spatial Audio, micrófono con cancelación de ruido, 120h batería",
+                    new BigDecimal("599000"),
+                    30,
+                    "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600&h=450&fit=crop",
+                    "Periféricos"
+                ));
+
+                // --- Consolas ---
+                productoRepository.save(new Producto(
+                    "PlayStation 5 Slim",
+                    "Consola Sony PlayStation 5 Slim Digital Edition, SSD 1TB, DualSense incluido, resolución 4K HDR",
+                    new BigDecimal("2599000"),
+                    10,
+                    "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&h=450&fit=crop",
+                    "Consolas"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Xbox Series X",
+                    "Consola Microsoft Xbox Series X 1TB, 4K UHD, hasta 120fps, Game Pass Ultimate compatible, SSD NVMe",
+                    new BigDecimal("2799000"),
+                    7,
+                    "https://images.unsplash.com/photo-1621259182978-fbf93132d53d?w=600&h=450&fit=crop",
+                    "Consolas"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Nintendo Switch OLED",
+                    "Consola Nintendo Switch OLED, pantalla 7\" OLED, 64GB almacenamiento, Joy-Con Neon, dock incluido",
+                    new BigDecimal("1899000"),
+                    14,
+                    "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=600&h=450&fit=crop",
+                    "Consolas"
+                ));
+
+                // --- Smart Home ---
+                productoRepository.save(new Producto(
+                    "Amazon Echo Show 15",
+                    "Pantalla inteligente Amazon Echo Show 15, 15.6\" Full HD, Alexa, Fire TV integrado, widgets personalizables",
+                    new BigDecimal("1349000"),
+                    12,
+                    "https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=600&h=450&fit=crop",
+                    "Smart Home"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Google Nest Hub Max",
+                    "Pantalla inteligente Google Nest Hub Max 10\", cámara Nest integrada, Google Assistant, Chromecast built-in",
+                    new BigDecimal("1099000"),
+                    16,
+                    "https://images.unsplash.com/photo-1512446816042-444d641267d4?w=600&h=450&fit=crop",
+                    "Smart Home"
+                ));
+
+                productoRepository.save(new Producto(
+                    "Ring Video Doorbell Pro 2",
+                    "Timbre inteligente Ring Video Doorbell Pro 2, video 1536p HD+, detección de movimiento 3D, visión nocturna a color",
+                    new BigDecimal("899000"),
+                    20,
+                    "https://images.unsplash.com/photo-1558002038-1055907df827?w=600&h=450&fit=crop",
+                    "Smart Home"
+                ));
+
+                System.out.println("Productos creados: 20 (precios en COP)");
             }
             
             // ===== PEDIDOS SEMILLA (para que el dashboard NO muestre ceros) =====

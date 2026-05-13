@@ -100,7 +100,8 @@
                         <div class="order-header">
                             <div>
                                 <strong>Pedido ${order.numeroOrden || ('#' + order.id)}</strong>
-                                <p style="font-size:.8rem;color:var(--text2)">Cliente: ${order.usuario?.nombre || 'N/A'} (${order.usuario?.email || 'N/A'})</p>
+                                ${order.facturaId ? `<p style="font-size:.75rem;color:var(--accent);font-weight:600;margin-top:.125rem">${order.facturaId}</p>` : ''}
+                                <p style="font-size:.8rem;color:var(--text2)">Cliente: ${order.usuarioNombre || 'N/A'} (${order.usuarioEmail || 'N/A'})</p>
                                 <p style="font-size:.8rem;color:var(--text2)">${new Date(order.fechaPedido).toLocaleString('es-CO')}</p>
                             </div>
                             <div style="text-align:right">
@@ -110,14 +111,30 @@
                         </div>
                         <div style="font-size:.85rem;margin-bottom:.75rem">
                             <strong style="color:var(--text2)">Detalles:</strong>
-                            <ul style="margin-top:.375rem;padding-left:1.25rem;color:var(--text2)">
-                                ${(order.detalles || []).map(d => `<li>${d.producto?.nombre || 'Producto'} x${d.cantidad} — ${formatCOP(d.precioUnitario)}</li>`).join('')}
-                            </ul>
+                            <table style="width:100%;margin-top:.375rem;font-size:.8rem;border-collapse:collapse">
+                                <thead><tr style="border-bottom:1px solid var(--border)">
+                                    <th style="text-align:left;padding:.25rem .5rem;color:var(--text2);font-weight:600">Producto</th>
+                                    <th style="text-align:center;padding:.25rem .5rem;color:var(--text2);font-weight:600">Cant</th>
+                                    <th style="text-align:right;padding:.25rem .5rem;color:var(--text2);font-weight:600">P.Unit</th>
+                                    <th style="text-align:right;padding:.25rem .5rem;color:var(--text2);font-weight:600">Subtotal</th>
+                                </tr></thead>
+                                <tbody>
+                                    ${(order.detalles || []).map(d => `<tr>
+                                        <td style="padding:.25rem .5rem">${d.productoNombre || 'Producto'}</td>
+                                        <td style="text-align:center;padding:.25rem .5rem">${d.cantidad}</td>
+                                        <td style="text-align:right;padding:.25rem .5rem">${formatCOP(d.precioUnitario)}</td>
+                                        <td style="text-align:right;padding:.25rem .5rem;font-weight:600">${formatCOP(d.precioUnitario * d.cantidad)}</td>
+                                    </tr>`).join('')}
+                                </tbody>
+                            </table>
                         </div>
                         <div class="order-actions">
-                            <button onclick="updateStatus(${order.id}, 'PENDIENTE')" class="btn btn-outline btn-sm">Pendiente</button>
-                            <button onclick="updateStatus(${order.id}, 'COMPLETADO')" class="btn btn-success btn-sm">Completar</button>
-                            <button onclick="updateStatus(${order.id}, 'CANCELADO')" class="btn btn-danger btn-sm">Cancelar</button>
+                            ${order.estado === 'PENDIENTE' ? `
+                                <button onclick="updateStatus(${order.id}, 'COMPLETADO')" class="btn btn-success btn-sm">Completar</button>
+                                <button onclick="updateStatus(${order.id}, 'CANCELADO')" class="btn btn-danger btn-sm">Cancelar</button>
+                            ` : `
+                                <span class="status status-${order.estado.toLowerCase()}" style="font-size:.7rem">Estado final: ${order.estado}</span>
+                            `}
                         </div>
                     </div>
                 `).join('');
